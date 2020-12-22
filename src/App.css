@@ -37,3 +37,11 @@
     transform: translateY(0px)
   }
 }
+
+.app-content {
+  height: 100vh;
+}
+
+.p-10 {
+  padding: 10px;
+}

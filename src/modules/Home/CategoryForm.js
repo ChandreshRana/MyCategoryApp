@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Modal } from 'antd';
-import { uuid } from 'uuidv4';
-import { cloneDeep, forEach } from 'lodash';
+import { Form, Input, Modal } from 'antd';
+import { v4 as uuidv4 } from 'uuid';
+import { cloneDeep } from 'lodash';
 import { useSelector, useDispatch } from 'react-redux';
 import { categoriesData, insertAsyncCategory, updateAsyncCategory } from './categorySlice';
 
@@ -28,15 +28,15 @@ const CategoryForm = (props) => {
 
   const onUserSubmitFinish = async (values) => {
     setLoading(true);
-    const variables = isUpdate
+    const formData = isUpdate
       ? { ...values, key: selectedNode.key }
-      : { ...values, key: uuid(), children: [] };
+      : { ...values, key: uuidv4(), children: [] };
     try {
       const cloneCategories = cloneDeep(listCategories)
       if (isUpdate) {        
-        dispatch(updateAsyncCategory({ cloneCategories, variables }))
+        dispatch(updateAsyncCategory({ cloneCategories, formData }))
       } else {
-        dispatch(insertAsyncCategory({ cloneCategories, parentNode: selectedNode, variables }))
+        dispatch(insertAsyncCategory({ cloneCategories, parentNode: selectedNode, formData }))
       }
       setShowModal(false);
       setSelectedNode(null);

@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import PopupContextMenu from '../../components/PopupContextMenu'
 import CategoryForm from './CategoryForm'
 import { categoriesData, deleteAsyncCategory } from './categorySlice';
+import './home.scss'
 
 const { Header, Content, Footer } = Layout;
 const { confirm } = Modal;
@@ -62,7 +63,26 @@ const Home = () => {
       },
     });
   }
-  //END
+  
+  const onRow = (record) => {
+    return {
+      onContextMenu: (event) => {
+        event.preventDefault()                  
+        if (!popup.visible) {                    
+          document.addEventListener(`click`, function onClickOutside() {
+            setPopupState({ visible: false })
+            document.removeEventListener(`click`, onClickOutside)
+          })
+        }
+        setPopupState({
+          record,
+          visible: true,
+          x: event.clientX,
+          y: event.clientY
+        })
+      }
+    }
+  }
 
   const columns = [
     {
@@ -73,38 +93,20 @@ const Home = () => {
   ];
 
   return (
-    <Layout style={{ height: "100vh" }}>
-      <Header style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
-        <h2 style={{ color: '#f2f2f2', marginBottom: '0', marginTop: '10px' }}>Categories</h2>
+    <Layout className='app-content'>
+      <Header className='header-conatiner'>
+        <h2 className='header-label'>Categories</h2>
       </Header>
-      <Content className="site-layout" style={{ padding: '0 50px', marginTop: 64 }}>
+      <Content className="site-layout content-container">
         <div>
           <Button type="link" size={'large'} onClick={() => onExpandCollapse()}>
             {`Expand/Collapse :: ( isExpandable: ${isExpandAll} )`}
           </Button>
         </div>
-        <div id='container' className="site-layout-background" style={{ padding: 24, minHeight: 380 }}>
+        <div id='container' className="site-layout-background table-conatiner">
           <Table            
             columns={columns}
-            onRow={(record) => {
-              return {
-                onContextMenu: (event) => {
-                  event.preventDefault()                  
-                  if (!popup.visible) {                    
-                    document.addEventListener(`click`, function onClickOutside() {
-                      setPopupState({ visible: false })
-                      document.removeEventListener(`click`, onClickOutside)
-                    })
-                  }
-                  setPopupState({
-                    record,
-                    visible: true,
-                    x: event.clientX,
-                    y: event.clientY
-                  })
-                }
-              }
-            }}
+            onRow={onRow}
             dataSource={listCategories}
             pagination={false}
             showHeader={false}

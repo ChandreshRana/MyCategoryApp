@@ -59,3 +59,9 @@
 .popup li > i {
   margin-right: 8px;
 }
+
+.list-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}

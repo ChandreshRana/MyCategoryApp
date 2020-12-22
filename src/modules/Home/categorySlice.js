@@ -86,83 +86,48 @@ export const { addSubCategory, editCategory, deleteCategory } = categorySlice.ac
 // START: delete category
 export const deleteAsyncCategory = categoryObj => dispatch => {
   const { cloneCategories, deleteCategoryObj } = categoryObj
-  const afterDeletedCategories = cloneCategories.map((catObj) => {
-    return deleteCategoryNode(catObj, deleteCategoryObj)
-  })
-  console.log('afterDeletedCategories: ', afterDeletedCategories)  
+  // const afterDeletedCategories = cloneCategories.map((catObj) => {
+  //   return deleteCategoryNode(catObj, deleteCategoryObj)
+  // })
+  cloneCategories.forEach(function iter(category) {
+    if (deleteCategoryObj.key === category.key) {          
+      // Here need to implement delete node
+    }
+    Array.isArray(category.children) && category.children.forEach(iter);
+  });  
   setTimeout(() => {
-    dispatch(deleteCategory(afterDeletedCategories));
+    dispatch(deleteCategory(cloneCategories));
   }, 1000);
 };
 
-export const deleteCategoryNode = (categoryObj, deletedNode) => {
-  const { key, children } = categoryObj
-  if (deletedNode.key === key) {     
-    // Have to work here for delete child node   
-    return null
-  } else if (children.length > 0) {
-    for (let i = 0; i < children.length; i++) {
-      deleteCategoryNode(children[i], deletedNode)
-    }
-  }
-  return categoryObj 
-}
-// END
 
 // START: Insert sub category
-export const insertAsyncCategory = categoryObj => dispatch => {  
-  const { cloneCategories, parentNode, variables } = categoryObj
-  const afterInsteredCategories = cloneCategories.map((catObj) => {
-    return insertNode(parentNode, catObj, variables)
-  })  
-  console.log('afterInsteredCategories: ', afterInsteredCategories)
+export const insertAsyncCategory = categoryObj => dispatch => {
+  const { cloneCategories, parentNode, formData } = categoryObj  
+  cloneCategories.forEach(function iter(category) {
+    if (parentNode.key === category.key) {          
+      category.children.push(formData);
+    }
+    Array.isArray(category.children) && category.children.forEach(iter);
+  });
   setTimeout(() => {
-    dispatch(addSubCategory(afterInsteredCategories));
+    dispatch(addSubCategory(cloneCategories));
   }, 1000);
 };
-
-export const insertNode = (parentNode, categoryObj, newNode) => {
-  // console.log('---categoryObj: ', categoryObj)
-  const { key, children } = categoryObj
-  console.log('---parentNode.key: ', parentNode.key)
-  console.log('---key: ', key)
-  if (parentNode.key === key) {        
-    const cloneChildren = cloneDeep(children)
-    cloneChildren.push(newNode)    
-    console.log('---merge return: ', { ...categoryObj, children: cloneChildren })
-    return { ...categoryObj, children: cloneChildren }
-  } else if (children.length > 0) {
-    for (let i = 0; i < children.length; i++) {
-      insertNode(parentNode, children[i], newNode)
-    }
-  }
-  return categoryObj
-}
-// END
 
 // START: update category
 export const updateAsyncCategory = categoryObj => dispatch => {
-  const { cloneCategories, variables } = categoryObj
-  const afterUpdatedCategories = cloneCategories.map((catObj) => {
-    return updateCategoryNode(catObj, variables)
-  })  
-  setTimeout(() => {
-    dispatch(editCategory(afterUpdatedCategories));
+  const { cloneCategories, formData } = categoryObj
+  cloneCategories.forEach(function iter(category) {
+    if (formData.key === category.key) {
+      category.title = formData.title;
+    }
+    Array.isArray(category.children) && category.children.forEach(iter);
+  });
+  setTimeout(() => {    
+    dispatch(editCategory(cloneCategories));
   }, 1000);
 };
-
-export const updateCategoryNode = (categoryObj, updatedNode) => {  
-  const { key, children } = categoryObj
-  if (updatedNode.key === key) {            
-    return { ...categoryObj, title: updatedNode.title }
-  } else if (children.length > 0) {
-    for (let i = 0; i < children.length; i++) {
-      updateCategoryNode(children[i], updatedNode)
-    }
-  }
-  return categoryObj
-}
-// END
 
 export const categoriesData = state => state && state.category && state.category.categories;
 
