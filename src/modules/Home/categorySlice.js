@@ -6,40 +6,40 @@ export const categorySlice = createSlice({
   initialState: {
     categories: [
       {
-        key: 1,
+        key: '1',
         title: 'Electronics',
         children: [
           {
-            key: 11,
+            key: '11',
             title: 'Cell Phones',
             children: []
           },
           {
-            key: 12,
+            key: '12',
             title: 'Camera',
             children: [
               {
-                key: 121,
+                key: '121',
                 title: 'Accessories',
                 children: []
               },
             ],
           },
           {
-            key: 13,
+            key: '13',
             title: 'Computers',
             children: [
               {
-                key: 131,
+                key: '131',
                 title: 'Laptop',
                 children: [
                   {
-                    key: 1311,
+                    key: '1311',
                     title: 'Apple',
                     children: []
                   },
                   {
-                    key: 1312,
+                    key: '1312',
                     title: 'LG',
                     children: []
                   },
@@ -50,7 +50,7 @@ export const categorySlice = createSlice({
         ],
       },
       {
-        key: 2,
+        key: '2',
         title: 'Furniture',
         children: []
       },
@@ -115,16 +115,21 @@ export const insertAsyncCategory = categoryObj => dispatch => {
   const afterInsteredCategories = cloneCategories.map((catObj) => {
     return insertNode(parentNode, catObj, variables)
   })  
+  console.log('afterInsteredCategories: ', afterInsteredCategories)
   setTimeout(() => {
     dispatch(addSubCategory(afterInsteredCategories));
   }, 1000);
 };
 
 export const insertNode = (parentNode, categoryObj, newNode) => {
+  // console.log('---categoryObj: ', categoryObj)
   const { key, children } = categoryObj
+  console.log('---parentNode.key: ', parentNode.key)
+  console.log('---key: ', key)
   if (parentNode.key === key) {        
     const cloneChildren = cloneDeep(children)
     cloneChildren.push(newNode)    
+    console.log('---merge return: ', { ...categoryObj, children: cloneChildren })
     return { ...categoryObj, children: cloneChildren }
   } else if (children.length > 0) {
     for (let i = 0; i < children.length; i++) {

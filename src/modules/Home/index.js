@@ -1,16 +1,16 @@
-import React, { useState, useRef } from 'react';
-import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Layout, Popconfirm, Button, Table } from 'antd';
+import React, { useState } from 'react';
+import {  ExclamationCircleOutlined } from '@ant-design/icons';
+import { Layout, Button, Table, Modal } from 'antd';
 import { cloneDeep } from 'lodash';
 import { useSelector, useDispatch } from 'react-redux';
 import PopupContextMenu from '../../components/PopupContextMenu'
 import CategoryForm from './CategoryForm'
-import { categoriesData, insertAsyncCategory, deleteAsyncCategory, updateAsyncCategory } from './categorySlice';
+import { categoriesData, deleteAsyncCategory } from './categorySlice';
 
 const { Header, Content, Footer } = Layout;
+const { confirm } = Modal;
 
-const Home = () => {
-  const outerRef = useRef(null);
+const Home = () => {  
   const listCategories = useSelector(categoriesData);
   const dispatch = useDispatch();
 
@@ -18,13 +18,17 @@ const Home = () => {
   const [showModal, setShowModal] = useState();
   const [isEditForm, setIsEditForm] = useState(false);
   const [isExpandAll, setExpandAll] = useState(true);
+  const [popup, setPopupState] = useState({
+    visible: false,
+    x: 0, y: 0
+  });
 
   const handleAdd = (record) => {
     setShowModal(true);
     setSelectedNode(record)
   };
 
-  const handleDelete = (record) => {    
+  const handleDelete = (record) => {
     const cloneCategories = cloneDeep(listCategories)
     dispatch(deleteAsyncCategory({ cloneCategories, deleteCategoryObj: record }))
   };
@@ -36,22 +40,27 @@ const Home = () => {
   };
 
   const onExpandCollapse = () => {
-    // currentlt it won't work 
+    // currently it won't work 
     setExpandAll(!isExpandAll)
   }
-
-  //Start: This is the context menu list click call backs. Currently not using these functions, but from here we can perform 
-  const onAddSubCategoryClick = record => {
-    // console.log('onAddSubCategoryClick: ', record)
-    // dispatch(insertAsyncCategory())
+  
+  const onAddSubCategoryClick = record => {    
+    handleAdd(record)
   }
   const onEditCategoryClick = record => {
-    // console.log('onEditCategoryClick: ', record)
-    // dispatch(updateAsyncCategory())
+    handleEdit(record)
   }
-  const onDeleteCategoryClick = record => {
-    // console.log('onDeleteCategoryClick: ', record)
-    // dispatch(deleteAsyncCategory(record))
+  const onDeleteCategoryClick = record => {    
+    confirm({
+      closable: true,
+      icon: <ExclamationCircleOutlined />,
+      title: 'Are you Sure?',
+      content: 'Do you want to remove this category?',
+      okType: 'danger',
+      onOk: () => {
+        handleDelete(record)
+      },
+    });
   }
   //END
 
@@ -60,32 +69,8 @@ const Home = () => {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
-    },
-    {
-      title: 'operation',
-      width: 150,
-      dataIndex: 'operation',
-      render: (text, record) =>
-        <div>
-          <Popconfirm title="Sure to delete?"
-            onConfirm={() => handleDelete(record)}>
-            <DeleteOutlined />
-          </Popconfirm>
-          <Button
-            type="link"
-            icon={<PlusOutlined />}
-            onClick={() => handleAdd(record)}
-          />
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          />
-        </div>
-    },
+    },   
   ];
-
-  console.log('is: ', isExpandAll)
 
   return (
     <Layout style={{ height: "100vh" }}>
@@ -93,25 +78,43 @@ const Home = () => {
         <h2 style={{ color: '#f2f2f2', marginBottom: '0', marginTop: '10px' }}>Categories</h2>
       </Header>
       <Content className="site-layout" style={{ padding: '0 50px', marginTop: 64 }}>
-        <div>          
+        <div>
           <Button type="link" size={'large'} onClick={() => onExpandCollapse()}>
             {`Expand/Collapse :: ( isExpandable: ${isExpandAll} )`}
           </Button>
         </div>
-        <div id='container' className="site-layout-background" style={{ padding: 24, minHeight: 380 }} ref={outerRef}>
-          <Table
-            ref={outerRef}
+        <div id='container' className="site-layout-background" style={{ padding: 24, minHeight: 380 }}>
+          <Table            
             columns={columns}
+            onRow={(record) => {
+              return {
+                onContextMenu: (event) => {
+                  event.preventDefault()                  
+                  if (!popup.visible) {                    
+                    document.addEventListener(`click`, function onClickOutside() {
+                      setPopupState({ visible: false })
+                      document.removeEventListener(`click`, onClickOutside)
+                    })
+                  }
+                  setPopupState({
+                    record,
+                    visible: true,
+                    x: event.clientX,
+                    y: event.clientY
+                  })
+                }
+              }
+            }}
             dataSource={listCategories}
             pagination={false}
             showHeader={false}
             expandable={{ defaultExpandAllRows: isExpandAll }}
-          />
+          />          
           <PopupContextMenu
-            outerRef={outerRef}
-            onAddSubCategoryClick={onAddSubCategoryClick}
-            onEditCategoryClick={onEditCategoryClick}
-            onDeleteCategoryClick={onDeleteCategoryClick}
+            {...popup}
+            onAddSubCategoryClick={onAddSubCategoryClick}           
+            onEditCategoryClick={onEditCategoryClick}           
+            onDeleteCategoryClick={onDeleteCategoryClick}           
           />
         </div>
       </Content>

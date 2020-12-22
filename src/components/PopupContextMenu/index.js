@@ -1,25 +1,26 @@
-import React from "react";
-import ContextMenu from "./ContextMenu";
+import React from "react"
+import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import './style.scss'
 
-const PopupContextMenu = (props) => {
-  const { 
-    outerRef, 
-    onAddSubCategoryClick,
-    onEditCategoryClick,
-    onDeleteCategoryClick,
-  } = props
-  const { xPos, yPos, menu } = ContextMenu(outerRef);
-  if (menu) {
-    return (
-      <ul className="popup" style={{ top: yPos, left: xPos }}>
-        <li onClick={onAddSubCategoryClick}>Add Sub Category</li>
-        <li onClick={onEditCategoryClick}>Edit Category</li>
-        <li onClick={onDeleteCategoryClick}>Delete Category</li>
-      </ul>
-    );
-  }
-  return null;
-};
+const PopupContextMenu = ({
+  record, visible, x, y,
+  onAddSubCategoryClick,
+  onEditCategoryClick,
+  onDeleteCategoryClick
+}) => {
+  return visible ? (
+    <ul className="popup" style={{ left: `${x}px`, top: `${y}px` }}>
+      <li onClick={() => onAddSubCategoryClick(record)}>
+        <div><PlusOutlined /><span style={{ padding: '10px' }}>Add Sub Category</span></div>
+      </li>
+      <li onClick={() => onEditCategoryClick(record)}>
+        <div><EditOutlined /><span style={{ padding: '10px' }}>Edit Category</span></div>
+      </li>
+      <li onClick={() => onDeleteCategoryClick(record)}>
+        <div><DeleteOutlined /><span style={{ padding: '10px' }}> Delete Category</span></div>
+      </li>
+    </ul>
+  ) : null
+}
 
-export default PopupContextMenu;
+export default PopupContextMenu
