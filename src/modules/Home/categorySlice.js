@@ -86,21 +86,22 @@ export const { addSubCategory, editCategory, deleteCategory } = categorySlice.ac
 // START: delete category
 export const deleteAsyncCategory = categoryObj => dispatch => {
   const { cloneCategories, deleteCategoryObj } = categoryObj
-  // const afterDeletedCategories = cloneCategories.map((catObj) => {
-  //   return deleteCategoryNode(catObj, deleteCategoryObj)
-  // })
-  cloneCategories.forEach(function iter(category) {    
+  const matchIndex = findIndex(cloneCategories, (data) => data.key === deleteCategoryObj.key)
+  if (matchIndex >= 0) {
+    cloneCategories.splice(0, matchIndex + 1)
+  }
+  cloneCategories.forEach(function iter(category) {
     if (Array.isArray(category.children) && category.children.length) {
       const matchIndex = findIndex(category.children, (data) => data.key === deleteCategoryObj.key)
       if (matchIndex >= 0) {
         category.children.splice(0, matchIndex + 1)
       }
-    }    
+    }
     Array.isArray(category.children) && category.children.forEach(iter);
   });
   setTimeout(() => {
     dispatch(deleteCategory(cloneCategories));
-  }, 1000);
+  }, 500);
 };
 
 
@@ -115,7 +116,7 @@ export const insertAsyncCategory = categoryObj => dispatch => {
   });
   setTimeout(() => {
     dispatch(addSubCategory(cloneCategories));
-  }, 1000);
+  }, 500);
 };
 
 // START: update category
@@ -129,7 +130,7 @@ export const updateAsyncCategory = categoryObj => dispatch => {
   });
   setTimeout(() => {
     dispatch(editCategory(cloneCategories));
-  }, 1000);
+  }, 500);
 };
 
 export const categoriesData = state => state && state.category && state.category.categories;

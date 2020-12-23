@@ -45,3 +45,15 @@
 .p-10 {
   padding: 10px;
 }
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.align-content-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
