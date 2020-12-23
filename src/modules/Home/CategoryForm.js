@@ -55,7 +55,7 @@ const CategoryForm = (props) => {
 
   return (
     <Modal
-      title={isUpdate ? "Edit Category" : "Add Category"}
+      title={isUpdate ? "Edit Category" : "Add Sub Category"}
       visible={showModal}
       confirmLoading={loading}
       onOk={handleAdd}

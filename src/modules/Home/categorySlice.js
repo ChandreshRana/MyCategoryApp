@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { cloneDeep, forEach } from 'lodash';
+import { findIndex } from 'lodash';
 
 export const categorySlice = createSlice({
   name: 'category',
@@ -89,12 +89,15 @@ export const deleteAsyncCategory = categoryObj => dispatch => {
   // const afterDeletedCategories = cloneCategories.map((catObj) => {
   //   return deleteCategoryNode(catObj, deleteCategoryObj)
   // })
-  cloneCategories.forEach(function iter(category) {
-    if (deleteCategoryObj.key === category.key) {          
-      // Here need to implement delete node
-    }
+  cloneCategories.forEach(function iter(category) {    
+    if (Array.isArray(category.children) && category.children.length) {
+      const matchIndex = findIndex(category.children, (data) => data.key === deleteCategoryObj.key)
+      if (matchIndex >= 0) {
+        category.children.splice(0, matchIndex + 1)
+      }
+    }    
     Array.isArray(category.children) && category.children.forEach(iter);
-  });  
+  });
   setTimeout(() => {
     dispatch(deleteCategory(cloneCategories));
   }, 1000);
@@ -103,9 +106,9 @@ export const deleteAsyncCategory = categoryObj => dispatch => {
 
 // START: Insert sub category
 export const insertAsyncCategory = categoryObj => dispatch => {
-  const { cloneCategories, parentNode, formData } = categoryObj  
+  const { cloneCategories, parentNode, formData } = categoryObj
   cloneCategories.forEach(function iter(category) {
-    if (parentNode.key === category.key) {          
+    if (parentNode.key === category.key) {
       category.children.push(formData);
     }
     Array.isArray(category.children) && category.children.forEach(iter);
@@ -124,7 +127,7 @@ export const updateAsyncCategory = categoryObj => dispatch => {
     }
     Array.isArray(category.children) && category.children.forEach(iter);
   });
-  setTimeout(() => {    
+  setTimeout(() => {
     dispatch(editCategory(cloneCategories));
   }, 1000);
 };
