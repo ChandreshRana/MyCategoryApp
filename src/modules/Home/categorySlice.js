@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { findIndex } from 'lodash';
+import { filter, findIndex, find, cloneDeep } from 'lodash';
 
 export const categorySlice = createSlice({
   name: 'category',
@@ -85,10 +85,11 @@ export const { addSubCategory, editCategory, deleteCategory } = categorySlice.ac
 
 // START: delete category
 export const deleteAsyncCategory = categoryObj => dispatch => {
-  const { cloneCategories, deleteCategoryObj } = categoryObj
-  const matchIndex = findIndex(cloneCategories, (data) => data.key === deleteCategoryObj.key)
-  if (matchIndex >= 0) {
-    cloneCategories.splice(0, matchIndex + 1)
+  const { categories, deleteCategoryObj } = categoryObj
+  let cloneCategories = cloneDeep(categories)
+  const matchFound = find(cloneCategories, (data) => data.key === deleteCategoryObj.key)
+  if (matchFound) {
+    cloneCategories = filter(cloneCategories, (catObj) => catObj.key !== deleteCategoryObj.key)
   }
   cloneCategories.forEach(function iter(category) {
     if (Array.isArray(category.children) && category.children.length) {
@@ -101,7 +102,7 @@ export const deleteAsyncCategory = categoryObj => dispatch => {
   });
   setTimeout(() => {
     dispatch(deleteCategory(cloneCategories));
-  }, 500);
+  }, 1000);
 };
 
 
@@ -116,7 +117,7 @@ export const insertAsyncCategory = categoryObj => dispatch => {
   });
   setTimeout(() => {
     dispatch(addSubCategory(cloneCategories));
-  }, 500);
+  }, 1000);
 };
 
 // START: update category
@@ -130,7 +131,7 @@ export const updateAsyncCategory = categoryObj => dispatch => {
   });
   setTimeout(() => {
     dispatch(editCategory(cloneCategories));
-  }, 500);
+  }, 1000);
 };
 
 export const categoriesData = state => state && state.category && state.category.categories;

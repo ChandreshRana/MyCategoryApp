@@ -32,7 +32,7 @@ const Home = () => {
 
   const handleDelete = (record) => {
     const cloneCategories = cloneDeep(listCategories)
-    dispatch(deleteAsyncCategory({ cloneCategories, deleteCategoryObj: record }))
+    dispatch(deleteAsyncCategory({ categories: cloneCategories, deleteCategoryObj: record }))
   };
 
   const handleEdit = (record) => {
